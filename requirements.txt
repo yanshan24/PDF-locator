@@ -2,3 +2,6 @@ Django==4.1.7
 python-dotenv
 requests
 psycopg2
+djangorestframework
+coreapi
+drf_yasg
