@@ -6,5 +6,7 @@ pip install -r requirements.txt
 python manage.py runserver
 ## Admin account
 http://127.0.0.1:8000/admin
-username: team3 
+username: team3
 password: 1234
+## API Documentation
+http://127.0.0.1:8000/api-docs/
