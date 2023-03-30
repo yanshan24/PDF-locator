@@ -5,11 +5,21 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RegistrationSerializer
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-@swagger_auto_schema(method='post', request_body=RegistrationSerializer)
+@swagger_auto_schema(
+        method='post',
+        request_body=RegistrationSerializer,
+        responses={
+        201: "Created: {'authorID': authorID}",
+        400: 'Bad Request',
+        422: 'Unprocessable Entity',
+    },)
 @api_view(['POST'])
 def register(request):
-    # register an account
+    """
+    Register a new author.
+    """
     if Author.objects.filter(email=request.data["email"]).exists():
         return Response({'message':"Email already in use"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     serializer = RegistrationSerializer(data=request.data)
