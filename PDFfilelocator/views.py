@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import *
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -22,7 +22,7 @@ def register(request):
     Register a new author.
     """
     if Author.objects.filter(email=request.data["email"]).exists():
-        return Response({'message':"Email already in use"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return Response({'message': 'Email already in use'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     serializer = RegistrationSerializer(data=request.data)
     if serializer.is_valid(): # make sure data match the model
         author = serializer.save()
@@ -36,10 +36,47 @@ def upload(request):
     """
     Upload PDF file and save its data.
     """
-    print(request.data)
+    authorID = request.data.get('authorID')
+    author = Author.objects.filter(authorID=authorID).first()
+    if not author:
+        return Response({'message': 'Author does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
     serializer = HistoryItemSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+@api_view(['GET'])
+def get_history(request, authorID):
+    """
+    Get specific history with authorID and id
+    """
+    author = Author.objects.filter(authorID=authorID).first()
+    if not author:
+        return Response({'message': 'Author does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    if author.is_manager: # if is_manager, they can access all HistoryItem
+        history = get_object_or_404(HistoryItem, id=request.query_params.get('id'))
+    else:
+        history = get_object_or_404(HistoryItem, authorID=authorID, id=request.query_params.get('id'))
+    serializer = HistoryItemSerializer(history)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_all_history(request, authorID):
+    """
+    Get all history with authorID
+    """
+    author = Author.objects.filter(authorID=authorID).first()
+    if not author:
+        return Response({'message': 'Author does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    if author.is_manager:
+        history_items = HistoryItem.objects.all()
+    else:
+        history_items = HistoryItem.objects.filter(authorID=authorID)
+
+    if history_items.count() > 0:
+        serializer = HistoryItemSerializer(history_items, many=True)
+        return Response(serializer.data)
+    else:
+        return Response({'message': 'History is empty'}, status=status.HTTP_404_NOT_FOUND)
