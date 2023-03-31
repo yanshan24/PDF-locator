@@ -21,5 +21,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api-docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('register', register),
-    path('upload', upload)
+    path('upload', upload),
+    path('history/<str:authorID>', get_history),
+    path('history/all/<str:authorID>', get_all_history)
 ]
