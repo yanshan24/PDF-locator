@@ -6,19 +6,16 @@ def uuid_hex():
     return uuid.uuid4().hex
 
 class Author(AbstractUser):
-    # model for author
     email = models.EmailField(max_length=60, unique=True)
     is_manager = models.BooleanField(default=False)
     authorID = models.CharField(unique=True, default=uuid_hex, editable=False, max_length=40)
 
-    # USERNAME_FIELD = 'email' # use email to login
-    # REQUIRED_FIELDS = ['username']
+class HistoryItem(models.Model):
+    pdf_file = models.TextField(blank=True)
+    file_name = models.CharField(default = 'pdfname.pdf', max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    authorID = models.CharField(max_length=40, default=uuid_hex)
+    json_data = models.TextField(blank=True)
 
-    # def get_id(self):
-    #     return settings.HOST_URL + "user/" + self.authorID
-
-    # def get_host(self):
-    #     return settings.HOST_URL
-
-    # def get_type(self):
-    #     return "author"
+    def __str__(self):
+        return self.file_name
