@@ -19,7 +19,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('api-docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('register/', register),
-    path('upload/', upload)
+    path('api-docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('register', register),
+    path('upload', upload)
 ]

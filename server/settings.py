@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'PDFfilelocator',
     'drf_yasg',
     'rest_framework',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
@@ -58,6 +59,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',
 ]
 
 ROOT_URLCONF = 'server.urls'
