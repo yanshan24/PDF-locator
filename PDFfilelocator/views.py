@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
+from django.contrib.auth.hashers import check_password
 from drf_yasg import openapi
 import json
 
@@ -32,6 +33,33 @@ def register(request):
         return Response({'message':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+def logout(request):
+    """
+    Remove JWT.
+    """
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def login(request):
+    """
+    Verify user credentials.
+    """
+    required_fields = ['email', 'password']
+    for field in required_fields:
+        if field not in request.data:
+            return Response({'message': f'Missing required field: {field}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    email = request.data.get('email')
+    password = request.data.get('password')
+    author = Author.objects.filter(email=email).first()
+
+    if not author or not check_password(password, author.password):
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    author_serializer = AuthorSerializer(author)
+    return Response(author_serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 def upload(request):
     """
     Upload PDF file and save its data.
@@ -50,7 +78,7 @@ def upload(request):
 @api_view(['GET'])
 def get_history(request, authorID):
     """
-    Get specific history with authorID and id
+    Get specific history with authorID and id.
     """
     author = Author.objects.filter(authorID=authorID).first()
     if not author:
@@ -65,7 +93,7 @@ def get_history(request, authorID):
 @api_view(['GET'])
 def get_all_history(request, authorID):
     """
-    Get all history with authorID
+    Get all history with authorID.
     """
     author = Author.objects.filter(authorID=authorID).first()
     if not author:
