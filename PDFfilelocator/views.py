@@ -87,6 +87,7 @@ def get_history(request, authorID):
         history = get_object_or_404(HistoryItem, id=request.query_params.get('id'))
     else:
         history = get_object_or_404(HistoryItem, authorID=authorID, id=request.query_params.get('id'))
+
     serializer = HistoryItemSerializer(history)
     return Response(serializer.data)
 
@@ -104,7 +105,7 @@ def get_all_history(request, authorID):
         history_items = HistoryItem.objects.filter(authorID=authorID)
 
     if history_items.count() > 0:
-        serializer = HistoryItemSerializer(history_items, many=True)
+        serializer = HistoryItemSerializer(history_items, many=True)        
         return Response(serializer.data)
     else:
         return Response({'message': 'History is empty'}, status=status.HTTP_404_NOT_FOUND)
